@@ -14,7 +14,7 @@ def _prepare_header(token):
 
 
 def login() -> [str, str]:
-    login_data = {"username": "client", "password": "CARINg123%"}
+    login_data = {"username": "admin", "password": "123456"}
     response = requests.post(BASE_URL + "token/", data=json.dumps(login_data), headers=BASE_HEADER)
     return response
 
@@ -54,9 +54,9 @@ def logout(refresh_token: str):
 
 def main():
     response = login()
+    print(f"login: {response.json()}")
     access_token = response.json()["access"]
     refresh_token = response.json()["refresh"]
-    print(f"login: {response.json()}")
 
     response = add_patient(access_token)
     print(f"add: {response.json()}")

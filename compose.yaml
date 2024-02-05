@@ -1,0 +1,64 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker compose reference guide at
+# https://docs.docker.com/compose/compose-file/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+services:
+  web:
+    build: .
+    restart: always
+    ports:
+      - 8000:8000
+    environment:
+      - DJANGO_SECRET_KEY=asdfklajhltier346245ui6hemasdrzg
+      - DJANGO_LANGUAGE_CODE=en-gb
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@test.ch
+      - DJANGO_SUPERUSER_PASSWORD=123456
+      - DATABASE_URL=postgresql://test:test@db:5432/djangoweb
+      - TIME_ZONE=Europe/Zurich
+      - JWT_ACCESS_TOKEN_LIFETIME=5
+      - JWT_REFRESH_TOKEN_LIFETIME=1
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/var/mediafiles
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+  # Define path on host to persist database
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=djangoweb
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U test -d djangoweb'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - static_volume:/var/staticfiles
+      - media_volume:/var/mediafiles
+    depends_on:
+      - web
+volumes:
+  db-data:
+  static_volume:
+  media_volume:
+
