@@ -39,8 +39,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Switch to the non-privileged user to run the application.
 USER appuser
 # Copy the source code into the container.
-COPY ./django_web_template ./django_web_template
-COPY ./manage.py ./manage.py
+COPY django_web_template ./django_web_template
+COPY manage.py ./manage.py
 
 USER root
 RUN python manage.py collectstatic

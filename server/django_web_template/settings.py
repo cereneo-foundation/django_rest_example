@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.FileAwareEnv()
 
-env.read_env(os.path.join(BASE_DIR, ".env"))
+env.read_env(os.path.join(BASE_DIR, "../../.env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -32,6 +32,7 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='needspropersetup')
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = env.list('HOST_NAMES', default=['http://localhost:8000'])
 
 # Application definition
 
@@ -131,7 +132,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",)
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_PERMISSION_CLASSES": ('django_web_template.appointment.permissions.ViewRestrictedDjangoModelPermissions',)
 }
 
 SIMPLE_JWT = {

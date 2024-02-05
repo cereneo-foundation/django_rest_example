@@ -1,5 +1,4 @@
 from rest_framework import viewsets
-from django_web_template.appointment.permissions import ViewRestrictedDjangoModelPermissions
 
 from django_web_template.appointment.models import Patient, Appointment
 from django_web_template.appointment.serializers import PatientSerializer, AppointmentSerializer
@@ -12,7 +11,6 @@ class PatientViewSet(viewsets.ModelViewSet):
     model = Patient
     queryset = Patient.objects.all().order_by('last_name', 'first_name')
     serializer_class = PatientSerializer
-    permission_classes = [ViewRestrictedDjangoModelPermissions]
 
 
 class AppointmentViewSet(viewsets.ModelViewSet):
@@ -21,4 +19,3 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     """
     queryset = Appointment.objects.all().order_by('date')
     serializer_class = AppointmentSerializer
-    permission_classes = [ViewRestrictedDjangoModelPermissions]

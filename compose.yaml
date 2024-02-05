@@ -9,10 +9,10 @@
 # https://github.com/docker/awesome-compose
 services:
   web:
-    build: .
+    build: ./server
     restart: always
-    ports:
-      - 8000:8000
+    #ports:
+     # - 8000:8000
     environment:
       - DJANGO_SECRET_KEY=asdfklajhltier346245ui6hemasdrzg
       - DJANGO_LANGUAGE_CODE=en-gb
@@ -23,6 +23,7 @@ services:
       - TIME_ZONE=Europe/Zurich
       - JWT_ACCESS_TOKEN_LIFETIME=5
       - JWT_REFRESH_TOKEN_LIFETIME=1
+      - HOSTNAMES=http://localhost:8000
     volumes:
       - static_volume:/app/static
       - media_volume:/var/mediafiles
@@ -51,7 +52,7 @@ services:
     build: ./nginx
     restart: always
     ports:
-      - 8080:80
+      - 8000:80
     volumes:
       - static_volume:/var/staticfiles
       - media_volume:/var/mediafiles
