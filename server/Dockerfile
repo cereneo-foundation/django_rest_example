@@ -36,18 +36,33 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
+RUN mkdir -p /var/log/gunicorn/
+RUN chown appuser /var/log/gunicorn/
+
 # Switch to the non-privileged user to run the application.
-USER appuser
+#USER appuser
 # Copy the source code into the container.
-COPY django_web_template ./django_web_template
-COPY manage.py ./manage.py
+#COPY django_web_template ./django_web_template
+#COPY manage.py ./manage.py
+COPY . .
 
 USER root
+# Give execution rights on the cron scripts
+RUN chmod 0644 /app/scripts/clear_token_cron.sh
+
+#Install Cron
+RUN apt-get update
+RUN apt-get -y install cron
+
+# Add the cron job
+RUN crontab -l | { cat; echo "0 * * * * bash /app/scripts/clear_token_cron.sh"; } | crontab -
+
 RUN python manage.py collectstatic
+
 USER appuser
 
 # Expose the port that the application listens on.
 EXPOSE 8000
 
 # Run the application.
-CMD python manage.py migrate; python manage.py createsuperuser --no-input; gunicorn 'django_web_template.wsgi' --bind=0.0.0.0:8000
+CMD python manage.py migrate; python manage.py createsuperuser --no-input; gunicorn 'django_web_template.wsgi' -c gunicorn.conf.py; cron

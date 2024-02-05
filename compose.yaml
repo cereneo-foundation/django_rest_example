@@ -37,8 +37,8 @@ services:
   # Define path on host to persist database
     volumes:
       - db-data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
+    #ports:
+     # - 5432:5432
     environment:
       - POSTGRES_DB=djangoweb
       - POSTGRES_USER=test
@@ -53,6 +53,7 @@ services:
     restart: always
     ports:
       - 8000:80
+      - 8001:443
     volumes:
       - static_volume:/var/staticfiles
       - media_volume:/var/mediafiles

@@ -52,26 +52,44 @@ def logout(refresh_token: str):
     return response
 
 
+def print_response(method, response):
+
+
+    status = response.status_code
+    json = "none"
+    try:
+        json = response.json()
+    except Exception as e:
+        pass
+    print(f"{method}: {json} ({status})")
+
+
 def main():
+    wait_time = 1
+    
     response = login()
-    print(f"login: {response.json()}")
+    print_response("login", response)
     access_token = response.json()["access"]
     refresh_token = response.json()["refresh"]
-
+    time.sleep(wait_time)
+    
     response = add_patient(access_token)
-    print(f"add: {response.json()}")
-
-    #time.sleep(18)
+    print_response("add", response)
+    time.sleep(wait_time)
+    
 
     response = get_patients(access_token)
-    print(f"patients: {response.json()}")
+    print_response("patients", response)
+    time.sleep(wait_time)
 
     response = refresh_login(refresh_token)
     access_token = response.json()["access"]
-    print(f"refresh: {response.json()}")
+    print_response("refresh", response)
+    time.sleep(wait_time)
 
     response = get_patients(access_token)
-    print(f"patients: {response.json()}")
+    print_response("patients", response)
+    time.sleep(wait_time)
 
     url = response.json()['results'][0]['url']
     update_data = {"first_name": "Harald",
@@ -79,22 +97,28 @@ def main():
                    "birth_date": response.json()['results'][0]['birth_date'],
                    }
     response = update_patient(access_token, url, update_data)
-    print(f"update: {response.json()}")
+    print_response("update", response)
+    time.sleep(wait_time)
 
     response = get_patients(access_token)
-    print(f"patients: {response.json()}")
+    print_response("patients", response)
+    time.sleep(wait_time)
 
     response = delete_patient(access_token, url)
-    print(f"delete: {response.status_code}")
+    print_response("delete", response)
+    time.sleep(wait_time)
 
     response = logout(refresh_token)
-    print(f"logout: {response.json()}")
+    print_response("logout", response)
+    time.sleep(wait_time)
 
     response = get_patients(access_token)
-    print(f"patients: {response.json()}")
+    print_response("patients", response)
+    time.sleep(wait_time)
 
     response = refresh_login(refresh_token)
-    print(f"refresh: {response.json()}")
+    print_response("refresh", response)
+    time.sleep(wait_time)
 
 
 if __name__ == "__main__":
