@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'django_web_template.jwt_extension',
-    'django_web_template.appointment',
 ]
 
 MIDDLEWARE = [

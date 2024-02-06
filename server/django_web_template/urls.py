@@ -22,11 +22,8 @@ from drf_yasg.views import get_schema_view
 from rest_framework import routers, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 
-from django_web_template.appointment import views as rest_views
 
 router = routers.DefaultRouter()
-router.register(r'patients', rest_views.PatientViewSet)
-router.register(r'appointment', rest_views.AppointmentViewSet)
 
 schema_view = get_schema_view(
     openapi.Info(
