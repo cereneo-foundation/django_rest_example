@@ -31,26 +31,6 @@ def logout(refresh_token: str):
     return response
 
 
-def get_patients(access_token: str) -> [dict, str]:
-    response = requests.get(BASE_URL + "patients/", headers=_prepare_header(access_token))
-    return response
-
-
-def update_patient(access_token: str, url: str, update_data: dict) -> [dict, str]:
-    response = requests.put(url, data=json.dumps(update_data), headers=_prepare_header(access_token))
-    return response
-
-
-def delete_patient(access_token: str, url: str) -> [dict, str]:
-    response = requests.delete(url, headers=_prepare_header(access_token))
-    return response
-
-
-def add_patient(access_token: str) -> [dict, str]:
-    data = {"first_name": "Hans", "last_name": "Meier", "birth_date": "1975-10-31"}
-    response = requests.post(BASE_URL + "patients/", data=json.dumps(data), headers=_prepare_header(access_token))
-    return response
-
 
 def print_response(method, response):
 
@@ -72,48 +52,14 @@ def main():
     access_token = response.json()["access"]
     refresh_token = response.json()["refresh"]
     time.sleep(wait_time)
-    
-    response = add_patient(access_token)
-    print_response("add", response)
-    time.sleep(wait_time)
-    
-
-    response = get_patients(access_token)
-    print_response("patients", response)
-    time.sleep(wait_time)
 
     response = refresh_login(refresh_token)
     access_token = response.json()["access"]
     print_response("refresh", response)
     time.sleep(wait_time)
 
-    response = get_patients(access_token)
-    print_response("patients", response)
-    time.sleep(wait_time)
-
-    url = response.json()['results'][0]['url']
-    update_data = {"first_name": "Harald",
-                   "last_name": response.json()['results'][0]['last_name'],
-                   "birth_date": response.json()['results'][0]['birth_date'],
-                   }
-    response = update_patient(access_token, url, update_data)
-    print_response("update", response)
-    time.sleep(wait_time)
-
-    response = get_patients(access_token)
-    print_response("patients", response)
-    time.sleep(wait_time)
-
-    response = delete_patient(access_token, url)
-    print_response("delete", response)
-    time.sleep(wait_time)
-
     response = logout(refresh_token)
     print_response("logout", response)
-    time.sleep(wait_time)
-
-    response = get_patients(access_token)
-    print_response("patients", response)
     time.sleep(wait_time)
 
     response = refresh_login(refresh_token)

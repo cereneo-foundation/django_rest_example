@@ -60,10 +60,6 @@ RUN crontab -l | { cat; echo "0 * * * * bash /app/scripts/clear_token_cron.sh"; 
 
 RUN mkdir ./static
 RUN mkdir ./media
-RUN touch error.log
-RUN touch request.log
-RUN chown appuser error.log
-RUN chown appuser request.log
 RUN chown appuser ./static
 RUN chown appuser ./media
 #USER appuser
