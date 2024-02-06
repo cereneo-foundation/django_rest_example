@@ -15,15 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.template.defaulttags import url
 from django.urls import path, include
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import routers, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
-
+from appointment import views as rest_views
 
 router = routers.DefaultRouter()
+router.register(r'patients', rest_views.PatientViewSet)
+router.register(r'appointment', rest_views.AppointmentViewSet)
 
 schema_view = get_schema_view(
     openapi.Info(
