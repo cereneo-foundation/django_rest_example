@@ -63,11 +63,13 @@ def create_secret_key():
 
 
 def main():
+    print(f"Welcome to docker environment creation")
     if not os.path.exists(SECRETS_DIR):
         os.mkdir(SECRETS_DIR)
-    print(f"Welcome to docker environment creation")
-    create_docker_env()
-    create_secret_key()
+        create_docker_env()
+        create_secret_key()
+    else:
+        print("Environment already existing")
 
 
 if __name__ == "__main__":

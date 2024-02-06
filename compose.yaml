@@ -11,7 +11,7 @@
 
 services:
   web:
-    image: django_web
+    image: django_server
     build: ./server
     restart: always
       #ports:
@@ -59,7 +59,7 @@ services:
       timeout: 5s
       retries: 5
   nginx:
-    image: django_server
+    image: django_proxy
     build: ./nginx
     restart: always
     ports:

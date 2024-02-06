@@ -68,8 +68,5 @@ RUN chown appuser ./static
 RUN chown appuser ./media
 #USER appuser
 
-# Expose the port that the application listens on.
-EXPOSE 8000
-
 # Run the application.
 CMD python manage.py migrate; python manage.py createsuperuser --no-input; python manage.py collectstatic; gunicorn 'django_web_template.wsgi' -c gunicorn.conf.py; cron
