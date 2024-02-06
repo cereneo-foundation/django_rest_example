@@ -29,12 +29,15 @@ def _write_to_file(base_dir, filename, content):
 
 
 def create_docker_env():
-    postgres_user = POSTGRES_STANDARD_USER
-    postgres_database = POSTGRES_STANDARD_DATABASE
-    postgres_pw = secrets.token_hex(POSTGRES_PASSWORD_LENGTH)
-    host_name = WEB_STANDARD_HOST_NAME
-    port = WEB_STANDARD_PORT
-    protocol = WEB_STANDARD_PROTOCOL
+    print("Creating .env file for docker ")
+    host_name = input(f"Define Hostname from which django will server (leave blank to use '{WEB_STANDARD_HOST_NAME}'):") or WEB_STANDARD_HOST_NAME
+    port = input(f"Define Host port from which django will server (leave blank to use '{WEB_STANDARD_PORT}'):") or WEB_STANDARD_PORT
+    if port != WEB_STANDARD_PORT:
+        input("Be sure you change the 'nginx.conf' to listen to the same port and 'docker-compose.yml' to map nginx to the same port")
+    protocol = input(f"Define Protocol which django will server (leave blank to use '{WEB_STANDARD_PROTOCOL}'):") or WEB_STANDARD_PROTOCOL
+    postgres_database = input(f"Postgres Database name (leave blank to use '{POSTGRES_STANDARD_DATABASE}'):") or POSTGRES_STANDARD_DATABASE
+    postgres_user = input(f"Postgres Username (leave blank to use '{POSTGRES_STANDARD_USER}'):") or POSTGRES_STANDARD_USER
+    postgres_pw = input(f"Postgres Password (leave blank to generate):") or secrets.token_hex(POSTGRES_PASSWORD_LENGTH)
 
     docker_env = DOCKER_ENV_FILE_TEMPLATE % {'name': postgres_database,
                                              'user': postgres_user,
@@ -63,6 +66,7 @@ def create_secret_key():
 def main():
     if not os.path.exists(SECRETS_DIR):
         os.mkdir(SECRETS_DIR)
+    print(f"Welcome to docker environment creation")
     create_docker_env()
     create_secret_key()
 

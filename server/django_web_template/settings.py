@@ -31,7 +31,7 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
-HOST_URL = None
+HOST_URL = 'http://localhost:8000'
 HOST = env.str('WEB_HOSTNAME', default=None)
 if HOST is not None:
     PORT = env.int('WEB_PORT')
