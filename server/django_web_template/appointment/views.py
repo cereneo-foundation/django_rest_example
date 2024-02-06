@@ -2,9 +2,10 @@ from rest_framework import viewsets
 
 from django_web_template.appointment.models import Patient, Appointment
 from django_web_template.appointment.serializers import PatientSerializer, AppointmentSerializer
+from django_web_template.jwt_extension.logger import LoggingMixin
 
 
-class PatientViewSet(viewsets.ModelViewSet):
+class PatientViewSet(LoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint that allows patients to be viewed or edited.
     """
@@ -13,7 +14,7 @@ class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
 
 
-class AppointmentViewSet(viewsets.ModelViewSet):
+class AppointmentViewSet(LoggingMixin, viewsets.ModelViewSet):
     """
     API endpoint that allows patients to be viewed or edited.
     """

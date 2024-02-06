@@ -19,20 +19,31 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.FileAwareEnv()
-
-env.read_env(os.path.join(BASE_DIR, "../../.env"))
+env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='needspropersetup')
+
+SECRET_KEY = env.str('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
+HOST_URL = None
+HOST = env.str('WEB_HOSTNAME', default=None)
+if HOST is not None:
+    PORT = env.int('WEB_PORT')
+    PROTOCOL = env.str('WEB_PROTOCOL')
+    if PROTOCOL == 'http' and PORT == 80 or PROTOCOL == 'https' and PORT == 443:
+        HOST_URL = f'{PROTOCOL}://{HOST}'
+    else:
+        HOST_URL = f'{PROTOCOL}://{HOST}:{PORT}'
+
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = env.list('HOST_NAMES', default=['http://localhost:8000'])
+
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000', HOST_URL]
 
 # Application definition
 
@@ -44,7 +55,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
@@ -82,10 +92,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_web_template.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-DATABASES = {'default': env.db("DATABASE_URL", default="sqlite:///db.sqlite3")}
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Internationalization
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
+
+LANGUAGE_CODE = env.str('DJANGO_LANGUAGE_CODE', 'en-gb')
+
+TIME_ZONE = env.str('TIME_ZONE', default='UTC')
+
+USE_I18N = True
+
+USE_TZ = True
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -105,27 +129,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-LANGUAGE_CODE = env.str('DJANGO_LANGUAGE_CODE', 'en-gb')
-
-TIME_ZONE = env.str('TIME_ZONE', default='UTC')
-
-USE_I18N = True
-
-USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+DATABASES = {'default': env.db("DATABASE_URL", default="sqlite:///db.sqlite3")}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Rest
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
@@ -136,6 +150,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ('django_web_template.appointment.permissions.ViewRestrictedDjangoModelPermissions',)
 }
 
+# JWT
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=env.float('JWT_ACCESS_TOKEN_LIFETIME', 5)),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=env.float('JWT_REFRESH_TOKEN_LIFETIME', 1)),
@@ -152,4 +167,51 @@ SWAGGER_SETTINGS = {
             'in': 'header'
         }
     }
+}
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'request': {
+            'format': '%(asctime)s %(message)s'
+        },
+    },
+
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        'error': {
+            'class': 'logging.FileHandler',
+            'filename': 'error.log',
+            'level': 'ERROR',
+            'formatter': 'verbose'
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'request.log',
+            'maxBytes': 10485760,  # 10 MB
+            'backupCount': 5,
+            'encoding': 'utf-8',
+            'formatter': 'verbose'
+        },
+    },
+
+    'loggers': {
+        'django': {
+            'handlers': ['console' if DEBUG else 'error'],
+            'level': env.str('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'django.request': {
+            'handlers': ['console' if DEBUG else 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
 }

@@ -7,29 +7,36 @@
 # You can add other services your application may depend on here, such as a
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
+
+
 services:
   web:
+    image: django_web
     build: ./server
     restart: always
-    #ports:
+      #ports:
      # - 8000:8000
     environment:
-      - DJANGO_SECRET_KEY=asdfklajhltier346245ui6hemasdrzg
+      - DJANGO_SECRET_KEY_FILE=/run/secrets/secret_key
       - DJANGO_LANGUAGE_CODE=en-gb
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_EMAIL=admin@test.ch
       - DJANGO_SUPERUSER_PASSWORD=123456
-      - DATABASE_URL=postgresql://test:test@db:5432/djangoweb
+      - DATABASE_URL_FILE=/run/secrets/db_url
       - TIME_ZONE=Europe/Zurich
       - JWT_ACCESS_TOKEN_LIFETIME=5
       - JWT_REFRESH_TOKEN_LIFETIME=1
-      - HOSTNAMES=http://localhost:8000
+      - WEB_HOSTNAME=${HOSTNAME}
+      - WEB_PORT=${PORT}
+      - WEB_PROTOCOL=${PROTOCOL}
+    secrets:
+      - secret_key
+      - db_url
     volumes:
       - static_volume:/app/static
-      - media_volume:/var/mediafiles
+      - media_volume:/app/media
     depends_on:
-      db:
-        condition: service_healthy
+      - db
   db:
     image: postgres
     restart: always
@@ -37,28 +44,37 @@ services:
   # Define path on host to persist database
     volumes:
       - db-data:/var/lib/postgresql/data/
-    #ports:
-     # - 5432:5432
+    ports:
+      - 5432:5432
     environment:
-      - POSTGRES_DB=djangoweb
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_pw
+    secrets:
+      - db_pw
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U test -d djangoweb'"]
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USER} -d ${DB_NAME}'"]
       interval: 10s
       timeout: 5s
       retries: 5
   nginx:
+    image: django_server
     build: ./nginx
     restart: always
     ports:
-      - 8000:80
-      - 8001:443
+      - ${PORT}:8000
     volumes:
       - static_volume:/var/staticfiles
       - media_volume:/var/mediafiles
     depends_on:
       - web
+secrets:
+   secret_key:
+     file: ./secrets/secret.key
+   db_url:
+     file: ./secrets/db_url.key
+   db_pw:
+     file: ./secrets/db.key
 volumes:
   db-data:
   static_volume:
