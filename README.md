@@ -148,11 +148,6 @@ server {
 This script will create the file .env in the root folder which general variables for the docker compose file and secrets 
 in /secrets which are needed to securely store passwords and are then used in the compose process.
 
-Now we have to jump back to the root 
-````shell
-$ 
-````
-
 Next we build and run the composition
 ````shell
 $ docker compose up --build -d
