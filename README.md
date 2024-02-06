@@ -1,4 +1,4 @@
-# django_web_template
+# django_rest_template
 
 This template provides a setup to easily develop RESTFUL servers.
 It implements following features:
