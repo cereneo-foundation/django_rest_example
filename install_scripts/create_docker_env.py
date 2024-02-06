@@ -1,12 +1,12 @@
 import os
 import secrets
 
-SECRETS_DIR = os.path.join("..", "secrets")
+DOCKER_COMPOSE_DIR = '.'
+SECRETS_DIR = os.path.join(DOCKER_COMPOSE_DIR, "secrets")
 WEB_STANDARD_HOST_NAME = "localhost"
 WEB_STANDARD_PORT = 8000
 WEB_STANDARD_PROTOCOL = 'http'
 
-DOCKER_COMPOSE_DIR = '..'
 DOCKER_ENV_FILE_TEMPLATE = "DB_NAME='%(name)s'\n" + \
                            "DB_USER='%(user)s'\n" + \
                            "HOSTNAME='%(host)s'\n" + \
@@ -29,15 +29,14 @@ def _write_to_file(base_dir, filename, content):
 
 
 def create_docker_env():
-    print("Creating .env file for docker ")
-    host_name = input(f"Define Hostname from which django will server (leave blank to use '{WEB_STANDARD_HOST_NAME}'):") or WEB_STANDARD_HOST_NAME
-    port = input(f"Define Host port from which django will server (leave blank to use '{WEB_STANDARD_PORT}'):") or WEB_STANDARD_PORT
+    host_name = input(f"Define Hostname from which django will server (leave blank to use '{WEB_STANDARD_HOST_NAME}'): ") or WEB_STANDARD_HOST_NAME
+    port = input(f"Define Host port from which django will server (leave blank to use '{WEB_STANDARD_PORT}'): ") or WEB_STANDARD_PORT
     if port != WEB_STANDARD_PORT:
         input("Be sure you change the 'nginx.conf' to listen to the same port and 'docker-compose.yml' to map nginx to the same port")
-    protocol = input(f"Define Protocol which django will server (leave blank to use '{WEB_STANDARD_PROTOCOL}'):") or WEB_STANDARD_PROTOCOL
-    postgres_database = input(f"Postgres Database name (leave blank to use '{POSTGRES_STANDARD_DATABASE}'):") or POSTGRES_STANDARD_DATABASE
-    postgres_user = input(f"Postgres Username (leave blank to use '{POSTGRES_STANDARD_USER}'):") or POSTGRES_STANDARD_USER
-    postgres_pw = input(f"Postgres Password (leave blank to generate):") or secrets.token_hex(POSTGRES_PASSWORD_LENGTH)
+    protocol = input(f"Define Protocol which django will server (leave blank to use '{WEB_STANDARD_PROTOCOL}'): ") or WEB_STANDARD_PROTOCOL
+    postgres_database = input(f"Postgres Database name (leave blank to use '{POSTGRES_STANDARD_DATABASE}'): ") or POSTGRES_STANDARD_DATABASE
+    postgres_user = input(f"Postgres Username (leave blank to use '{POSTGRES_STANDARD_USER}'): ") or POSTGRES_STANDARD_USER
+    postgres_pw = input(f"Postgres Password (leave blank to generate): ") or secrets.token_hex(POSTGRES_PASSWORD_LENGTH)
 
     docker_env = DOCKER_ENV_FILE_TEMPLATE % {'name': postgres_database,
                                              'user': postgres_user,

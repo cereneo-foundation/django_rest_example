@@ -147,7 +147,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
-    "DEFAULT_PERMISSION_CLASSES": ('django_web_template.appointment.permissions.ViewRestrictedDjangoModelPermissions',)
+    "DEFAULT_PERMISSION_CLASSES": ('django_web_template.jwt_extension.permissions.ViewRestrictedDjangoModelPermissions',)
 }
 
 # JWT
